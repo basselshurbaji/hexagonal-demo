@@ -1,9 +1,6 @@
 # environment
 .env
 
-# generated code (recreate with `make sqlc`)
-db/gen/
-
 # binaries
 hexagonal-demo
 *.exe

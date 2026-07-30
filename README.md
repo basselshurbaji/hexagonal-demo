@@ -69,4 +69,5 @@ go run .
 - `make migrate-create name=...` — new goose migration in `db/migrations`
 - `make migrate` / `migrate-down` / `migrate-status`
 - `make seed` / `seed-reset` — goose `-no-versioning` over `db/seeds`
-- `make sqlc` — regenerate `db/gen` from migrations (schema) + `db/queries`
+- `make sqlc` — regenerate `db/gen` from migrations (schema) + `db/queries`;
+  the generated code is committed, so rerun this after changing queries or schema
