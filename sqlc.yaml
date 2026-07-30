@@ -1,0 +1,11 @@
+version: "2"
+sql:
+  - engine: "mysql"
+    # sqlc understands goose annotations natively: it builds the schema from
+    # the `-- +goose Up` sections of each migration, in order.
+    schema: "db/migrations"
+    queries: "db/queries"
+    gen:
+      go:
+        package: "sqlcgen"
+        out: "db/gen"
