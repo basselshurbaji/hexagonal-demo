@@ -108,6 +108,35 @@ func (q *Queries) GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]Playli
 	return items, nil
 }
 
+const getPlaylistsByUserID = `-- name: GetPlaylistsByUserID :many
+select p.id, p.name from playlists p
+join user_playlists up on up.playlist_id = p.id
+where up.user_id = ?
+`
+
+func (q *Queries) GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]Playlist, error) {
+	rows, err := q.db.QueryContext(ctx, getPlaylistsByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Playlist
+	for rows.Next() {
+		var i Playlist
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const linkPlaylistToUser = `-- name: LinkPlaylistToUser :exec
 insert into user_playlists (user_id, playlist_id) values (?, ?)
 `

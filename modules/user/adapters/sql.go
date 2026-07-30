@@ -29,7 +29,3 @@ func (a *SqlAdapter) GetUserByID(ctx context.Context, id uint64) (entity.User, e
 		Email: row.Email,
 	}, nil
 }
-
-func (a *SqlAdapter) GetUserPlaylistIDs(ctx context.Context, userID uint64) ([]uint64, error) {
-	return a.queries.GetUserPlaylistIDs(ctx, userID)
-}

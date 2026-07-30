@@ -68,6 +68,20 @@ func (m *Module) GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]Playlis
 	return out, nil
 }
 
+// GetPlaylistsByUserID returns the playlists linked to the given user. The
+// user↔playlist association is owned by this module (user_playlists).
+func (m *Module) GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]Playlist, error) {
+	playlists, err := m.svc.GetPlaylistsByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]Playlist, 0, len(playlists))
+	for _, p := range playlists {
+		out = append(out, fromEntity(p))
+	}
+	return out, nil
+}
+
 // GetPlaylist returns a playlist with its songs. Returns ErrNotFound if the
 // playlist does not exist.
 func (m *Module) GetPlaylist(ctx context.Context, id uint64) (PlaylistWithSongs, error) {

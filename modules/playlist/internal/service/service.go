@@ -67,6 +67,10 @@ func (s *Service) GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]entity
 	return s.repository.GetPlaylistsByIDs(ctx, ids)
 }
 
+func (s *Service) GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]entity.Playlist, error) {
+	return s.repository.GetPlaylistsByUserID(ctx, userID)
+}
+
 func dedupe(ids []uint64) []uint64 {
 	seen := make(map[uint64]struct{}, len(ids))
 	out := make([]uint64, 0, len(ids))

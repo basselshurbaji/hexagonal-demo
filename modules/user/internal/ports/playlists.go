@@ -6,10 +6,10 @@ import (
 	"hexagonal-demo/modules/user/internal/entity"
 )
 
-// PlaylistCatalog is the user module's driven port for playlist data. The user
-// core resolves which playlist ids belong to a user (its own data) and uses
-// this port to hydrate them.
+// PlaylistCatalog is the user module's driven port for playlist data. The
+// user↔playlist association is owned by the playlist side of the port — this
+// module only asks questions in terms of users.
 type PlaylistCatalog interface {
-	// GetPlaylistsByIDs returns the playlists that exist among ids; missing ids are omitted.
-	GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]entity.Playlist, error)
+	// GetPlaylistsByUserID returns the playlists linked to the given user.
+	GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]entity.Playlist, error)
 }

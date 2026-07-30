@@ -22,8 +22,8 @@ func NewPlaylistModuleAdapter(playlists *playlist.Module) *PlaylistModuleAdapter
 	return &PlaylistModuleAdapter{playlists: playlists}
 }
 
-func (a *PlaylistModuleAdapter) GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]entity.Playlist, error) {
-	res, err := a.playlists.GetPlaylistsByIDs(ctx, ids)
+func (a *PlaylistModuleAdapter) GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]entity.Playlist, error) {
+	res, err := a.playlists.GetPlaylistsByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

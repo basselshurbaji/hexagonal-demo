@@ -25,4 +25,6 @@ type Repository interface {
 	// GetPlaylistsByIDs returns the playlists that exist among ids; missing ids
 	// are simply omitted from the result — no error.
 	GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]entity.Playlist, error)
+	// GetPlaylistsByUserID returns the playlists linked to the given user.
+	GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]entity.Playlist, error)
 }

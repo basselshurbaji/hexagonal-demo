@@ -19,30 +19,3 @@ func (q *Queries) GetUserByID(ctx context.Context, id uint64) (User, error) {
 	err := row.Scan(&i.ID, &i.Name, &i.Email)
 	return i, err
 }
-
-const getUserPlaylistIDs = `-- name: GetUserPlaylistIDs :many
-select playlist_id from user_playlists where user_id = ?
-`
-
-func (q *Queries) GetUserPlaylistIDs(ctx context.Context, userID uint64) ([]uint64, error) {
-	rows, err := q.db.QueryContext(ctx, getUserPlaylistIDs, userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []uint64
-	for rows.Next() {
-		var playlist_id uint64
-		if err := rows.Scan(&playlist_id); err != nil {
-			return nil, err
-		}
-		items = append(items, playlist_id)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}

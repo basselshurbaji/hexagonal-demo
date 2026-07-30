@@ -20,19 +20,12 @@ func (s *Service) GetUserByID(ctx context.Context, id uint64) (entity.User, erro
 	return s.repository.GetUserByID(ctx, id)
 }
 
-// GetUserPlaylists returns the playlists linked to the user. The playlist ids
-// are the user module's own data (user_playlists); the playlists themselves
-// are hydrated through the PlaylistCatalog port.
+// GetUserPlaylists returns the playlists linked to the user, resolved
+// entirely through the PlaylistCatalog port — the user module has no
+// knowledge of how the association is stored.
 func (s *Service) GetUserPlaylists(ctx context.Context, userID uint64) ([]entity.Playlist, error) {
 	if _, err := s.repository.GetUserByID(ctx, userID); err != nil {
 		return nil, err
 	}
-	ids, err := s.repository.GetUserPlaylistIDs(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if len(ids) == 0 {
-		return nil, nil
-	}
-	return s.playlists.GetPlaylistsByIDs(ctx, ids)
+	return s.playlists.GetPlaylistsByUserID(ctx, userID)
 }

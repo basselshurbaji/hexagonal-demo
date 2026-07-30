@@ -97,3 +97,15 @@ func (a *SqlAdapter) GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]ent
 	}
 	return playlists, nil
 }
+
+func (a *SqlAdapter) GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]entity.Playlist, error) {
+	rows, err := a.queries.GetPlaylistsByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	playlists := make([]entity.Playlist, 0, len(rows))
+	for _, row := range rows {
+		playlists = append(playlists, entity.Playlist{ID: row.ID, Name: row.Name})
+	}
+	return playlists, nil
+}
