@@ -35,29 +35,57 @@ type PlaylistWithSongs struct {
 	Songs []Song
 }
 
+// Facade is the module's public interface. Consumers — driving adapters and
+// other modules' adapters — depend on this instead of *Module, so they can be
+// tested against a fake and the module keeps its internals free to change.
+type Facade interface {
+	// CreatePlaylist creates a playlist owned by the given user.
+	CreatePlaylist(ctx context.Context, name string, userID uint64) (Playlist, error)
+
+	// AddSongs links songs to a playlist. Returns ErrNotFound if the playlist
+	// does not exist and ErrSongNotFound if any song id does not exist.
+	AddSongs(ctx context.Context, playlistID uint64, songIDs []uint64) error
+
+	// GetPlaylistsByIDs returns the playlists that exist among ids; missing
+	// ids are simply omitted from the result.
+	GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]Playlist, error)
+
+	// GetPlaylistsByUserID returns the playlists linked to the given user. The
+	// user↔playlist association is owned by this module (user_playlists).
+	GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]Playlist, error)
+
+	// GetPlaylist returns a playlist with its songs. Returns ErrNotFound if
+	// the playlist does not exist.
+	GetPlaylist(ctx context.Context, id uint64) (PlaylistWithSongs, error)
+}
+
+// facade implements Facade. It holds the module pointer rather than the
+// service so it can be handed out before Initialize runs (two-phase setup);
+// the service is only dereferenced per call.
+type facade struct {
+	m *Module
+}
+
+var _ Facade = (*facade)(nil)
+
 func fromEntity(e entity.Playlist) Playlist {
 	return Playlist{ID: e.ID, Name: e.Name}
 }
 
-// CreatePlaylist creates a playlist owned by the given user.
-func (m *Module) CreatePlaylist(ctx context.Context, name string, userID uint64) (Playlist, error) {
-	playlist, err := m.svc.CreatePlaylist(ctx, name, userID)
+func (f *facade) CreatePlaylist(ctx context.Context, name string, userID uint64) (Playlist, error) {
+	playlist, err := f.m.svc.CreatePlaylist(ctx, name, userID)
 	if err != nil {
 		return Playlist{}, err
 	}
 	return fromEntity(playlist), nil
 }
 
-// AddSongs links songs to a playlist. Returns ErrNotFound if the playlist
-// does not exist and ErrSongNotFound if any song id does not exist.
-func (m *Module) AddSongs(ctx context.Context, playlistID uint64, songIDs []uint64) error {
-	return m.svc.AddSongs(ctx, playlistID, songIDs)
+func (f *facade) AddSongs(ctx context.Context, playlistID uint64, songIDs []uint64) error {
+	return f.m.svc.AddSongs(ctx, playlistID, songIDs)
 }
 
-// GetPlaylistsByIDs returns the playlists that exist among ids; missing ids
-// are simply omitted from the result.
-func (m *Module) GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]Playlist, error) {
-	playlists, err := m.svc.GetPlaylistsByIDs(ctx, ids)
+func (f *facade) GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]Playlist, error) {
+	playlists, err := f.m.svc.GetPlaylistsByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -68,10 +96,8 @@ func (m *Module) GetPlaylistsByIDs(ctx context.Context, ids []uint64) ([]Playlis
 	return out, nil
 }
 
-// GetPlaylistsByUserID returns the playlists linked to the given user. The
-// user↔playlist association is owned by this module (user_playlists).
-func (m *Module) GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]Playlist, error) {
-	playlists, err := m.svc.GetPlaylistsByUserID(ctx, userID)
+func (f *facade) GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]Playlist, error) {
+	playlists, err := f.m.svc.GetPlaylistsByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +108,8 @@ func (m *Module) GetPlaylistsByUserID(ctx context.Context, userID uint64) ([]Pla
 	return out, nil
 }
 
-// GetPlaylist returns a playlist with its songs. Returns ErrNotFound if the
-// playlist does not exist.
-func (m *Module) GetPlaylist(ctx context.Context, id uint64) (PlaylistWithSongs, error) {
-	playlist, songs, err := m.svc.GetPlaylist(ctx, id)
+func (f *facade) GetPlaylist(ctx context.Context, id uint64) (PlaylistWithSongs, error) {
+	playlist, songs, err := f.m.svc.GetPlaylist(ctx, id)
 	if err != nil {
 		return PlaylistWithSongs{}, err
 	}
