@@ -37,13 +37,13 @@ func registerPlaylistModule(db *sql.DB, mux *http.ServeMux, module *playlist.Mod
 		playlistadapters.NewSqlAdapter(db),
 		playlistadapters.NewSongModuleAdapter(songs.Facade()),
 	)
-	playlistadapters.NewHTTPAdapter(module).RegisterRoutes(mux)
+	playlistadapters.NewHTTPAdapter(module.Facade()).RegisterRoutes(mux)
 }
 
 func registerUserModule(db *sql.DB, mux *http.ServeMux, module *user.Module, playlists *playlist.Module) {
 	module.Initialize(
 		useradapters.NewSqlAdapter(db),
-		useradapters.NewPlaylistModuleAdapter(playlists),
+		useradapters.NewPlaylistModuleAdapter(playlists.Facade()),
 	)
 	useradapters.NewHTTPAdapter(module).RegisterRoutes(mux)
 }

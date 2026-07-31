@@ -15,10 +15,10 @@ var _ ports.PlaylistCatalog = (*PlaylistModuleAdapter)(nil)
 // playlist module's facade, translating playlist.Playlist into the user
 // module's own model.
 type PlaylistModuleAdapter struct {
-	playlists *playlist.Module
+	playlists playlist.Facade
 }
 
-func NewPlaylistModuleAdapter(playlists *playlist.Module) *PlaylistModuleAdapter {
+func NewPlaylistModuleAdapter(playlists playlist.Facade) *PlaylistModuleAdapter {
 	return &PlaylistModuleAdapter{playlists: playlists}
 }
 
