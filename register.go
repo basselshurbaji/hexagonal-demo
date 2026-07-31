@@ -29,13 +29,13 @@ func RegisterModules(db *sql.DB, mux *http.ServeMux) {
 
 func registerSongModule(db *sql.DB, mux *http.ServeMux, module *song.Module) {
 	module.Initialize(songadapters.NewSqlAdapter(db))
-	songadapters.NewHTTPAdapter(module).RegisterRoutes(mux)
+	songadapters.NewHTTPAdapter(module.Facade()).RegisterRoutes(mux)
 }
 
 func registerPlaylistModule(db *sql.DB, mux *http.ServeMux, module *playlist.Module, songs *song.Module) {
 	module.Initialize(
 		playlistadapters.NewSqlAdapter(db),
-		playlistadapters.NewSongModuleAdapter(songs),
+		playlistadapters.NewSongModuleAdapter(songs.Facade()),
 	)
 	playlistadapters.NewHTTPAdapter(module).RegisterRoutes(mux)
 }

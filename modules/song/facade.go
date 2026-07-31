@@ -31,10 +31,26 @@ func fromEntity(e entity.Song) Song {
 	}
 }
 
-// GetSongsByIDs returns the songs that exist among ids; missing ids are
-// simply omitted from the result.
-func (m *Module) GetSongsByIDs(ctx context.Context, ids []uint64) ([]Song, error) {
-	songs, err := m.svc.GetSongsByIDs(ctx, ids)
+// Facade is the module's public interface. Consumers — driving adapters and
+// other modules' adapters — depend on this instead of *Module, so they can be
+// tested against a fake and the module keeps its internals free to change.
+type Facade interface {
+	// GetSongsByIDs returns the songs that exist among ids; missing ids are
+	// simply omitted from the result.
+	GetSongsByIDs(ctx context.Context, ids []uint64) ([]Song, error)
+}
+
+// facade implements Facade. It holds the module pointer rather than the
+// service so it can be handed out before Initialize runs (two-phase setup);
+// the service is only dereferenced per call.
+type facade struct {
+	m *Module
+}
+
+var _ Facade = (*facade)(nil)
+
+func (f *facade) GetSongsByIDs(ctx context.Context, ids []uint64) ([]Song, error) {
+	songs, err := f.m.svc.GetSongsByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}

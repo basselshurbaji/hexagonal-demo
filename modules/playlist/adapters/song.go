@@ -14,10 +14,10 @@ var _ ports.SongCatalog = (*SongModuleAdapter)(nil)
 // SongModuleAdapter implements the SongCatalog port by calling the song
 // module's facade, translating song.Song into the playlist module's own model.
 type SongModuleAdapter struct {
-	songs *song.Module
+	songs song.Facade
 }
 
-func NewSongModuleAdapter(songs *song.Module) *SongModuleAdapter {
+func NewSongModuleAdapter(songs song.Facade) *SongModuleAdapter {
 	return &SongModuleAdapter{songs: songs}
 }
 
