@@ -45,5 +45,5 @@ func registerUserModule(db *sql.DB, mux *http.ServeMux, module *user.Module, pla
 		useradapters.NewSqlAdapter(db),
 		useradapters.NewPlaylistModuleAdapter(playlists.Facade()),
 	)
-	useradapters.NewHTTPAdapter(module).RegisterRoutes(mux)
+	useradapters.NewHTTPAdapter(module.Facade()).RegisterRoutes(mux)
 }
