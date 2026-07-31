@@ -15,3 +15,9 @@ type Module struct {
 func (m *Module) Initialize(repository ports.Repository) {
 	m.svc = service.New(repository)
 }
+
+// Facade returns the module's public facade. Safe to call before Initialize —
+// the facade captures the stable module pointer, not the service.
+func (m *Module) Facade() Facade {
+	return &facade{m: m}
+}

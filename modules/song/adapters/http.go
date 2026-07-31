@@ -13,10 +13,10 @@ import (
 // HTTPAdapter is a driving adapter: it talks to the module through its public
 // facade, like any other consumer.
 type HTTPAdapter struct {
-	songs *song.Module
+	songs song.Facade
 }
 
-func NewHTTPAdapter(songs *song.Module) *HTTPAdapter {
+func NewHTTPAdapter(songs song.Facade) *HTTPAdapter {
 	return &HTTPAdapter{songs: songs}
 }
 
